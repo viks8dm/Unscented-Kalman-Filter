@@ -1,86 +1,96 @@
-# Unscented Kalman Filter Project Starter Code
-Self-Driving Car Engineer Nanodegree Program
+# Unscented Kalman Filter
 
-In this project utilize an Unscented Kalman Filter to estimate the state of a moving object of interest with noisy lidar and radar measurements. Passing the project requires obtaining RMSE values that are lower that the tolerance outlined in the project reburic. 
+In this project-2 of term-2 of self driving car nanodegree program by Udacity Unscented Kalman Filter is utilized to estimate the state of a moving object of interest with noisy lidar and radar measurements.
 
-This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases)
+For satisfactory project completion, the requirement is that the RMSE values obtained should be lower than the target-RMSE values outlined in project ruberic, details of which are available on [the project resources page](https://review.udacity.com/#!/projects/284/view)
 
-This repository includes two files that can be used to set up and intall [uWebSocketIO](https://github.com/uWebSockets/uWebSockets) for either Linux or Mac systems. For windows you can use either Docker, VMware, or even [Windows 10 Bash on Ubuntu](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) to install uWebSocketIO. Please see [this concept in the classroom](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/16cf4a78-4fc7-49e1-8621-3450ca938b77) for the required version and installation scripts.
+## Contents of this repository
 
-Once the install for uWebSocketIO is complete, the main program can be built and ran by doing the following from the project top directory.
+The project has been created using Udacity's [starter Code](https://github.com/udacity/CarND-Unscented-Kalman-Filter-Project)
 
-1. mkdir build
-2. cd build
-3. cmake ..
-4. make
-5. ./UnscentedKF
-
-Note that the programs that need to be written to accomplish the project are src/ukf.cpp, src/ukf.h, tools.cpp, and tools.h
-
-The program main.cpp has already been filled out, but feel free to modify it.
-
-Here is the main protcol that main.cpp uses for uWebSocketIO in communicating with the simulator.
+To successfully run this code, one needs to download the [Eigen-library](https://d17h27t6h515a5.cloudfront.net/topher/2017/March/58b7604e_eigen/eigen.zip), unzip it and save the `Eigen` folder in the `src` directory (`NOTE`: The `src` folder on my github page already has this in place, as I have forked the github page from `Udacity`)
 
 
-INPUT: values provided by the simulator to the c++ program
+* `src/main.cpp` - communicates with the [simulator](https://github.com/udacity/self-driving-car-sim/releases/); receiving data measurements, calls a function to run the Unscented Kalman filter script and calls a function to calculate RMSE
+* `src/ukf.cpp` - initializes the filter, defines the prediction function, the update function for lidar, and the update function for radar
+* `src/tools.cpp` - function to calculate RMSE
+* `results` - directory that contains any results
 
-["sensor_measurement"] => the measurment that the simulator observed (either lidar or radar)
+
+## Results & Discussion
+
+[image1]: ./results/dataset1.jpeg "simulation result for dataset-1 with RSME values"
+[image2]: ./results/dataset2.jpeg "simulation result for dataset-2 with RSME values"
+
+The RMSE-target criteria for dataset-1 and dataset-2 were given in the project ruberic as listed in the table below:
 
 
-OUTPUT: values provided by the c++ program to the simulator
+| RMSE parameter  | dataset-1: target | dataset-2: target  |
+| ------------- |:-------------:| -----:|
+| PX      | 0.09 | 0.20 |
+| PY      | 0.10 | 0.20 |
+| VX 		| 0.40 | 0.55 |
+| VY      | 0.30 | 0.55 |
 
-["estimate_x"] <= kalman filter estimated position x
-["estimate_y"] <= kalman filter estimated position y
-["rmse_x"]
-["rmse_y"]
-["rmse_vx"]
-["rmse_vy"]
+As shown in the screenshots below. Both for dataset-1 and dataset-2, the final RMSE values satisfy this criteria, and corresponsing values are:
 
----
+| RMSE parameter  | dataset-1: output | dataset-2: output  |
+| ------------- |:-------------:| -----:|
+| PX      | 0.0687 | 0.0664 |
+| PY      | 0.0835 | 0.0651 |
+| VX 		| 0.3615 | 0.4977 |
+| VY      | 0.1951 | 0.2023 |
 
-## Other Important Dependencies
-* cmake >= 3.5
-  * All OSes: [click here for installation instructions](https://cmake.org/install/)
-* make >= 4.1 (Linux, Mac), 3.81 (Windows)
-  * Linux: make is installed by default on most Linux distros
-  * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
-  * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
-* gcc/g++ >= 5.4
-  * Linux: gcc / g++ is installed by default on most Linux distros
-  * Mac: same deal as make - [install Xcode command line tools](https://developer.apple.com/xcode/features/)
-  * Windows: recommend using [MinGW](http://www.mingw.org/)
 
-## Basic Build Instructions
+--
 
-1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./UnscentedKF` Previous versions use i/o from text files.  The current state uses i/o
-from the simulator.
+![alt text][image1]
+--
 
-## Editor Settings
+![alt text][image2]
+--
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+### Parameter Tuning
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+Achieving the RMSE target involved playing around with the process noise parameters `std_a_` and `std_yawdd_`. The simulation was started with default values of 30 for each and after multiple tuning runs, the final values used are:
 
-## Code Style
+* `std_a_` = 1.25
+*  `std_yawdd_` = 0.75
 
-Please stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html) as much as possible.
+It is possible that slightly higher value combination of these parameters will also achieve the desired RMSE target (for a given initial value set), however it was not attempted to optimize these values, but just get a combination for with the RMSE criteria for both data-sets are satisfied.
 
-## Generating Additional Data
+### Setting Initial value
 
-This is optional!
+The simulation was started with default values for both the state vector `x_` and state covariance matrix `P_`, such that;
 
-If you'd like to generate your own radar and lidar data, see the
-[utilities repo](https://github.com/udacity/CarND-Mercedes-SF-Utilities) for
-Matlab scripts that can generate additional data.
+* `x_` = `[0, 0, 0, 0, 0]` ; a vector of zeros for CTRV Model with `x_`  = `[px, py, vel, yaw-ang, yaw-ang_rate]`
+* `P_` = 5x5 identity matrix
 
-## Project Instructions and Rubric
+However, with further tuning of the process noise parameters it was evident that by just tuning these noise parameters, achieving the target RMSE values is not an easy task, hence, initial values were updated after looking at some sample lidar and radar data. The final values used were:
 
-This information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/c3eb3583-17b2-4d83-abf7-d852ae1b9fff/concepts/f437b8b0-f2d8-43b0-9662-72ac4e4029c1)
-for instructions and the project rubric.
+* `x_` = `[0.01, 0.01, 0, 0.001, 0]`
+* `P_` = 5x5 matrix with non-zero diagonal entries. The diagonal entries were updated to:
+	* `P_(0,0) = 1`
+	* `P_(1,1) = 1`
+	* `P_(2,2) = 40`
+	* `P_(3,3) = 1`
+	* `P_(4,4) = 0.1`
+
+	
+It was observed that covariance matrix entry corresponding to velocity-magnitude `P_(2,2) = 40` has significant impact on RMSE for `VX` and this was most difficult to tune, especially in the sense of stricking a balance between the path traces in dataset-1 and dataset-2. If other parameters are kept constant, values greater than 50 seem to work great with dataset-2, however, they lead to deterioration in performance for dataset-1. This might be because the final result is dependent on combination of parameters for both velocity-magnitude and yaw-rate.
+
+## To run the code
+
+Clone this repository and enter following commands in a terminal
+
+`mkdir build && cd build`
+
+`cmake .. && make`
+
+`./UnscentedKF`
+
+After execution of `./UnscentedKF`, simulator should be opened and it should be started with dataset of interest selected, as shown in the screenshots above. 
+
+
+
+
